@@ -1,0 +1,11 @@
+package templates
+
+import "github.com/f-bh/ghq/model"
+
+templ Board(tiles ...model.Tile) {
+	<div class="grid grid-cols-8 grid-rows-8 w-full h-full">
+		for _, tile := range tiles {
+			@Tile(tile)
+		}
+	</div>
+}

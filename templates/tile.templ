@@ -1,0 +1,7 @@
+package templates
+
+import "github.com/f-bh/ghq/model"
+
+templ Tile(t model.Tile) {
+	<div id={ "tile " + t.GetPostion().ToString() } class="bg-slate-400 border-solid border-slate-600 border-8"></div>
+}

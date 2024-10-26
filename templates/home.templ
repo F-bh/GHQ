@@ -1,0 +1,16 @@
+package templates
+
+import "github.com/f-bh/ghq/model"
+
+templ Home(state model.GameState) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
+		<link href="/static/css/tailwind.css" rel="stylesheet"/>
+		<title>GHQ</title>
+		<meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0"/>
+		<body class="h-screen w-lvw flex flex-1 flex-col">
+			@Board(state.Tiles...)
+		</body>
+	</html>
+}
