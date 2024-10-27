@@ -16,15 +16,26 @@ templ Lobby() {
 	</div>
 }
 
-templ OpenLobby(players []string, sessionId model.GameId) {
+templ OpenLobby(players []string, sessionId model.GameId, baseUrl string) {
 	<div>
 		<span>
-			<h2>
-				session code: { sessionId }
-			</h2>
+			if len(players) < 2 {
+				<h2 class="text-xl font-bold">copy session link { baseUrl + "/lobby/join/" + sessionId } </h2>
+				<p>waiting for second player</p>
+			}
 			for x, player := range players {
 				<p>player { fmt.Sprintf("%v",x) }: { player } </p>
 			}
+			<h2>
+				session code: { sessionId }
+			</h2>
 		</span>
 	</div>
+}
+
+templ JoinLobby(game model.IGameState, baseUrl string) {
+	<form id="lobby-form" class="flex flex-col" hx-post={ "/lobby/joined/" + game.GetSession() }>
+		<input type="text" value="" maxlength="18" minlength="1" placeholder="player name" name="display-name"/>
+		<input class="bg-green-300 rounded-md p-2 border-black border-2" type="submit" value="join game"/>
+	</form>
 }

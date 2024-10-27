@@ -9,6 +9,7 @@ type GameId = string
 
 type IGameState interface {
 	GetSession() GameId
+	GetPlayers() []IPlayer
 }
 
 type GameState struct {
@@ -17,8 +18,12 @@ type GameState struct {
 	Players [2]IPlayer
 }
 
-func (g GameState) GetSession() GameId {
+func (g *GameState) GetSession() GameId {
 	return g.id
+}
+
+func (g *GameState) GetPlayers() []IPlayer {
+	return g.Players[:]
 }
 
 func newId() GameId {

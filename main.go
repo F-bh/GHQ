@@ -15,11 +15,15 @@ func main() {
 
 	state := model.ServerState{}
 
-	scaffold := templates.Scaffold(templates.Lobby())
+	createLobby := templates.Scaffold(templates.Lobby())
 
-	mux.Handle("/", templ.Handler(scaffold))
+	mux.Handle("/", templ.Handler(createLobby))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+
 	mux.HandleFunc("/newgame/", handlers.NewSession(&state))
+	mux.HandleFunc("/lobby/{session}", handlers.JoinSession(&state))
+	mux.HandleFunc("/lobby/join/{session}", handlers.JoinSession(&state))
+	mux.HandleFunc("/lobby/joined/{session}", handlers.JoinedSession(&state))
 
 	http.ListenAndServe(":3000", mux)
 }
