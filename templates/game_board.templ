@@ -3,7 +3,7 @@ package templates
 import "github.com/f-bh/ghq/model"
 
 templ Board(tiles ...model.Tile) {
-	<div class="grid grid-cols-8 grid-rows-8 w-full h-full">
+	<div class="grid grid-cols-8 grid-rows-8 aspect-square m-4 rounded-3xl">
 		for _, tile := range tiles {
 			@Tile(tile)
 		}

@@ -1,0 +1,30 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/f-bh/ghq/model"
+)
+
+templ Lobby() {
+	<div class="flex flex-col w-1/2">
+		<div>
+			<form id="lobby-form" class="flex flex-col" hx-post="/newgame/">
+				<input type="text" value="" maxlength="18" minlength="1" placeholder="player name" name="display-name"/>
+				<input class="bg-green-300 rounded-md p-2 border-black border-2" type="submit" value="generate session code"/>
+			</form>
+		</div>
+	</div>
+}
+
+templ OpenLobby(players []string, sessionId model.GameId) {
+	<div>
+		<span>
+			<h2>
+				session code: { sessionId }
+			</h2>
+			for x, player := range players {
+				<p>player { fmt.Sprintf("%v",x) }: { player } </p>
+			}
+		</span>
+	</div>
+}
