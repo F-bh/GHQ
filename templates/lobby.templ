@@ -5,10 +5,12 @@ import (
 	"github.com/f-bh/ghq/model"
 )
 
+var copySessionLinkHandle = templ.NewOnceHandle()
+
 templ Lobby() {
 	<div class="flex flex-col w-1/2">
 		<div>
-			<form id="lobby-form" class="flex flex-col" hx-post="/newgame/">
+			<form id="lobby-form" class="flex flex-col" hx-post="/newgame/" hx-swap="outerHTML">
 				<input type="text" value="" maxlength="18" minlength="1" placeholder="player name" name="display-name"/>
 				<input class="bg-green-300 rounded-md p-2 border-black border-2" type="submit" value="generate session code"/>
 			</form>
@@ -16,11 +18,21 @@ templ Lobby() {
 	</div>
 }
 
-templ OpenLobby(players []string, sessionId model.GameId, baseUrl string) {
-	<div>
+templ OpenLobby(players []string, sessionId model.GameId, joinUrl templ.SafeURL) {
+	@copySessionLinkHandle.Once() {
+		@templ.JSONScript("url", joinUrl)
+		<script type="text/javascript">
+			function copyToClipBoard(){
+				const link = JSON.parse(document.getElementById('url').textContent);
+				navigator.clipboard.writeText(link);
+				alert("Join link copied!");
+			} 
+		</script>
+	}
+	<div hx-ext="sse" sse-connect={ fmt.Sprintf("/events/%v", sessionId) } sse-swap="PlayerJoined">
 		<span>
 			if len(players) < 2 {
-				<h2 class="text-xl font-bold">copy session link { baseUrl + "/lobby/join/" + sessionId } </h2>
+				<button onClick="copyToClipBoard()" class="text-xl font-bold">copy session link</button>
 				<p>waiting for second player</p>
 			}
 			for x, player := range players {
@@ -34,7 +46,7 @@ templ OpenLobby(players []string, sessionId model.GameId, baseUrl string) {
 }
 
 templ JoinLobby(game model.IGameState, baseUrl string) {
-	<form id="lobby-form" class="flex flex-col" hx-post={ "/lobby/joined/" + game.GetSession() }>
+	<form id="lobby-form" class="flex flex-col" hx-post={ "/lobby/joined/" + game.GetSessionId() } hx-push-url="true">
 		<input type="text" value="" maxlength="18" minlength="1" placeholder="player name" name="display-name"/>
 		<input class="bg-green-300 rounded-md p-2 border-black border-2" type="submit" value="join game"/>
 	</form>

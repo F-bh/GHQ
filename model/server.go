@@ -1,5 +1,6 @@
 package model
 
 type ServerState struct {
-	Games []IGameState
+	Games   []IGameState
+	BaseUrl string
 }

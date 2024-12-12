@@ -29,7 +29,7 @@ func Scaffold(content templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><script src=\"https://unpkg.com/htmx.org@2.0.3\" integrity=\"sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq\" crossorigin=\"anonymous\"></script><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><title>GHQ</title><meta name=\"viewport\" content=\"height=device-height, width=device-width, initial-scale=1.0\"><body class=\"h-screen w-lvw flex flex-1 flex-col bg-stone-200 items-center\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><script src=\"https://unpkg.com/htmx.org@2.0.3\" integrity=\"sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq\" crossorigin=\"anonymous\"></script><script src=\"https://unpkg.com/htmx-ext-sse@2.2.2/sse.js\"></script><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><title>GHQ</title><meta name=\"viewport\" content=\"height=device-height, width=device-width, initial-scale=1.0\"><body class=\"h-screen w-lvw flex flex-1 flex-col bg-stone-200 items-center\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
