@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"net/http"
 )
 
 type EventStream = chan Event
@@ -25,6 +26,9 @@ func NewEvent(name EventName, data string) Event {
 	}
 }
 
-func (e *Event) ToSSE() string {
-	return fmt.Sprintf("event: %v\n data: %v\n\n", e.name, e.data)
+func (e *Event) ToSSE(w http.ResponseWriter) error {
+	if _, err := fmt.Fprintf(w, "event: \"%v\"\ndata: \"%v\"\n\n", e.name, e.data); err != nil {
+		return err
+	}
+	return nil
 }

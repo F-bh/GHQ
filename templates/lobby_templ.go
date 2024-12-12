@@ -15,7 +15,7 @@ import (
 
 var copySessionLinkHandle = templ.NewOnceHandle()
 
-func Lobby() templ.Component {
+func CreateLobby() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -36,7 +36,7 @@ func Lobby() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col w-1/2\"><div><form id=\"lobby-form\" class=\"flex flex-col\" hx-post=\"/newgame/\" hx-swap=\"outerHTML\"><input type=\"text\" value=\"\" maxlength=\"18\" minlength=\"1\" placeholder=\"player name\" name=\"display-name\"> <input class=\"bg-green-300 rounded-md p-2 border-black border-2\" type=\"submit\" value=\"generate session code\"></form></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col w-1/2\"><form id=\"lobby-form\" class=\"flex flex-col\" hx-post=\"/lobby/create\" hx-swap=\"outerHTML\"><input type=\"text\" value=\"\" maxlength=\"18\" minlength=\"1\" placeholder=\"player name\" name=\"display-name\"> <input class=\"bg-green-300 rounded-md p-2 border-black border-2\" type=\"submit\" value=\"generate session code\"></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -98,13 +98,13 @@ func OpenLobby(players []string, sessionId model.GameId, joinUrl templ.SafeURL) 
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/events/%v", sessionId))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/lobby.templ`, Line: 32, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/lobby.templ`, Line: 30, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" sse-swap=\"PlayerJoined\"><span>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" sse-swap=\"message\" sse-close=\"PlayerJoined\"><span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -122,7 +122,7 @@ func OpenLobby(players []string, sessionId model.GameId, joinUrl templ.SafeURL) 
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%v", x))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/lobby.templ`, Line: 39, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/lobby.templ`, Line: 37, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -135,7 +135,7 @@ func OpenLobby(players []string, sessionId model.GameId, joinUrl templ.SafeURL) 
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(player)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/lobby.templ`, Line: 39, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/lobby.templ`, Line: 37, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -153,7 +153,7 @@ func OpenLobby(players []string, sessionId model.GameId, joinUrl templ.SafeURL) 
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(sessionId)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/lobby.templ`, Line: 42, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/lobby.templ`, Line: 40, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -193,9 +193,9 @@ func JoinLobby(game model.IGameState, baseUrl string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs("/lobby/joined/" + game.GetSessionId())
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs("/lobby/" + game.GetSessionId())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/lobby.templ`, Line: 49, Col: 93}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/lobby.templ`, Line: 47, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {

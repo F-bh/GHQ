@@ -44,13 +44,10 @@ func NewSession(server *model.ServerState) func(http.ResponseWriter, *http.Reque
 func JoinSession(server *model.ServerState) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var game model.IGameState
-		player := model.Player()
 
 		if err := r.ParseForm(); err != nil {
 			log.Println("failed to parse session form")
 		}
-
-		player.SetDisplayName(r.Form.Get("display-name"))
 
 		for _, gameSession := range server.Games {
 			if gameSession.GetSessionId() == r.PathValue("session") {
@@ -58,8 +55,6 @@ func JoinSession(server *model.ServerState) func(http.ResponseWriter, *http.Requ
 				break
 			}
 		}
-
-		game.Join(player)
 
 		templ.Handler(
 			templates.Scaffold(
@@ -87,6 +82,8 @@ func JoinedSession(server *model.ServerState) func(http.ResponseWriter, *http.Re
 				break
 			}
 		}
+
+		game.Join(player)
 
 		names := make([]string, 0, 2)
 		for _, player := range game.GetPlayers() {

@@ -32,12 +32,15 @@ func EventHandler(server *model.ServerState) func(w http.ResponseWriter, r *http
 		for {
 			select {
 			case <-r.Context().Done():
+				log.Print("SSE socket closed")
 				break loop
 			case e := <-game.SubEvents():
-				if _, err := w.Write([]byte(e.ToSSE())); err != nil {
+				err := e.ToSSE(w)
+				if err != nil {
 					log.Printf("failed to send event: %+v to game: %v\n", e, game.GetSessionId())
-					break
+					continue
 				}
+				log.Printf("sent SSE Event: %+v", e)
 				w.(http.Flusher).Flush()
 			}
 		}
