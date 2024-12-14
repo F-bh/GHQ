@@ -14,7 +14,7 @@ func NewSession(server *model.ServerState) func(http.ResponseWriter, *http.Reque
 	return func(w http.ResponseWriter, r *http.Request) {
 		player := model.Player()
 		game := model.NewGamestate()
-		server.Games = append(server.Games, &game)
+		server.Games = append(server.Games, game)
 
 		game.Players[0] = player
 

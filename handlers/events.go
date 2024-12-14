@@ -28,19 +28,23 @@ func EventHandler(server *model.ServerState) func(w http.ResponseWriter, r *http
 		w.Header().Set("Cache-Control", "no-cache")
 		w.Header().Set("Connection", "keep-alive")
 
+		done := make(chan bool)
+		defer close(done)
+		eventChannel := game.SubEvents(done)
+
 	loop:
 		for {
 			select {
 			case <-r.Context().Done():
 				log.Print("SSE socket closed")
+				done <- true
 				break loop
-			case e := <-game.SubEvents():
+			case e := <-eventChannel:
 				err := e.ToSSE(w)
 				if err != nil {
 					log.Printf("failed to send event: %+v to game: %v\n", e, game.GetSessionId())
 					continue
 				}
-				log.Printf("sent SSE Event: %+v", e)
 				w.(http.Flusher).Flush()
 			}
 		}

@@ -3,6 +3,7 @@ package model
 import (
 	"math/rand"
 	"strconv"
+	"sync"
 )
 
 type GameId = string
@@ -12,14 +13,24 @@ type IGameState interface {
 	GetPlayers() []IPlayer
 	Join(IPlayer) bool
 	PubEvent(Event)
-	SubEvents() <-chan Event
+	SubEvents(<-chan bool) <-chan Event
+}
+
+type eventBus struct {
+	sync.Mutex
+	subscribers []Subscription
+}
+
+type Subscription struct {
+	eventChannel chan<- Event
+	done         <-chan bool
 }
 
 type GameState struct {
-	id       GameId
-	Tiles    []Tile
-	Players  [2]IPlayer
-	eventBus chan Event
+	id      GameId
+	Tiles   []Tile
+	Players [2]IPlayer
+	events  eventBus
 }
 
 func (g *GameState) GetSessionId() GameId {
@@ -31,11 +42,31 @@ func (g *GameState) GetPlayers() []IPlayer {
 }
 
 func (g *GameState) PubEvent(e Event) {
-	g.eventBus <- e
+	g.events.Lock()
+	defer g.events.Unlock()
+	for ix, subscriber := range g.events.subscribers {
+		select {
+		case <-subscriber.done:
+			g.events.subscribers = append(g.events.subscribers[:ix], g.events.subscribers[ix+1:]...)
+			close(subscriber.eventChannel)
+			continue
+		default:
+		}
+
+		subscriber.eventChannel <- e
+	}
 }
 
-func (g *GameState) SubEvents() <-chan Event {
-	return g.eventBus
+func (g *GameState) SubEvents(ch <-chan bool) <-chan Event {
+	g.events.Lock()
+	defer g.events.Unlock()
+
+	eventChan := make(chan Event, 1)
+	g.events.subscribers = append(g.events.subscribers, Subscription{
+		eventChannel: eventChan,
+		done:         ch,
+	})
+	return eventChan
 }
 
 // returns false if the game is already full
@@ -53,10 +84,10 @@ func newId() GameId {
 	return strconv.Itoa(int(r))
 }
 
-func NewGamestate() GameState {
+func NewGamestate() *GameState {
 	state := GameState{}
 	state.id = newId()
-	state.eventBus = make(chan Event, 1)
+	state.events = eventBus{}
 
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
@@ -65,5 +96,5 @@ func NewGamestate() GameState {
 		}
 	}
 
-	return state
+	return &state
 }
