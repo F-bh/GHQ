@@ -1,0 +1,14 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/f-bh/ghq/model"
+)
+
+templ PlayerList(players []model.IPlayer) {
+	<ul>
+		for x, player := range players {
+			<li>player { fmt.Sprintf("%v",x) }: { player.GetDisplayName() } is { player.GetStateString() } </li>
+		}
+	</ul>
+}

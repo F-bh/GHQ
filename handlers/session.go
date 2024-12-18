@@ -24,19 +24,14 @@ func NewSession(server *model.ServerState) func(http.ResponseWriter, *http.Reque
 
 		player.SetDisplayName(r.Form.Get("display-name"))
 
-		names := make([]string, 0, 2)
-		for _, player := range game.Players {
-			if player != nil {
-				names = append(names, player.GetDisplayName())
-			}
-		}
-
 		joinUrl := templ.URL(fmt.Sprintf("http://%v/lobby/join/%v", server.BaseUrl, game.GetSessionId()))
 
 		w.Header().Add("HX-Replace-Url", "/lobby/"+game.GetSessionId())
+		http.SetCookie(w, model.GetPlayerCookie(player))
+
 		templ.Handler(
 			templates.OpenLobby(
-				names, game.GetSessionId(), joinUrl)).
+				game.GetPlayers(), game.GetSessionId(), joinUrl)).
 			ServeHTTP(w, r)
 	}
 }
@@ -85,21 +80,37 @@ func JoinedSession(server *model.ServerState) func(http.ResponseWriter, *http.Re
 
 		game.Join(player)
 
-		names := make([]string, 0, 2)
-		for _, player := range game.GetPlayers() {
-			if player != nil {
-				names = append(names, player.GetDisplayName())
-			}
-		}
-
 		joinUrl := templ.URL(fmt.Sprintf("http://%v/lobby/join/%v", server.BaseUrl, game.GetSessionId()))
 
 		templ.Handler(
 			templates.OpenLobby(
-				names, game.GetSessionId(), joinUrl)).
+				game.GetPlayers(), game.GetSessionId(), joinUrl)).
 			ServeHTTP(w, r)
 
-		e := templates.CreatePlayerJoinedEvent(r.Context(), names, game.GetSessionId(), joinUrl)
+		e := templates.CreatePlayerJoinedEvent(r.Context(), game.GetPlayers(), game.GetSessionId(), joinUrl)
 		game.PubEvent(e)
+	}
+}
+
+func Ready(server *model.ServerState) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		game := GetGame(r, server)
+		playerId, err := IsAuthorized(r, game)
+
+		if err != nil {
+			log.Printf("failed to get player cookie: %v", err)
+			templ.Handler(
+				templates.Error("failed to authenticate player."),
+			).ServeHTTP(w, r)
+			return
+		}
+
+		for _, player := range game.GetPlayers() {
+			if player.GetId() == *playerId {
+				player.SetState(model.Ready)
+			}
+		}
+
+		//TODO
 	}
 }

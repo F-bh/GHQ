@@ -6,21 +6,36 @@ import (
 	"github.com/google/uuid"
 )
 
+type PlayerState = int
+type PlayerId = string
+
+const (
+	InLobby PlayerState = iota
+	Ready
+	InGame
+	Disconnected
+)
+
 type IPlayer interface {
 	GetDisplayName() string
 	SetDisplayName(string)
-	GetId() string
+	GetId() PlayerId
+	GetState() PlayerState
+	GetStateString() string
+	SetState(PlayerState)
 }
 
 type player struct {
 	displayName string
-	id          string
+	id          PlayerId
+	state       PlayerState
 }
 
 func Player() IPlayer {
 	return &player{
 		id:          newPlayerId(),
 		displayName: "",
+		state:       InLobby,
 	}
 }
 
@@ -35,8 +50,31 @@ func (p *player) SetDisplayName(in string) {
 	}
 }
 
-func (p *player) GetId() string {
+func (p *player) GetId() PlayerId {
 	return p.id
+}
+
+func (p *player) GetState() PlayerState {
+	return p.state
+}
+
+func (p *player) GetStateString() string {
+	switch p.GetState() {
+	case InLobby:
+		return "in lobby"
+	case Ready:
+		return "ready"
+	case InGame:
+		return "in game"
+	case Disconnected:
+		return "disconnected"
+	default:
+		return "unknown"
+	}
+}
+
+func (p *player) SetState(state PlayerState) {
+	p.state = state
 }
 
 func newPlayerId() string {

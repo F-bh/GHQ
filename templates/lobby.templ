@@ -16,7 +16,7 @@ templ CreateLobby() {
 	</div>
 }
 
-templ OpenLobby(players []string, sessionId model.GameId, joinUrl templ.SafeURL) {
+templ OpenLobby(players []model.IPlayer, sessionId model.GameId, joinUrl templ.SafeURL) {
 	<div hx-ext="sse" sse-connect={ fmt.Sprintf("/events/%v", sessionId) } sse-swap="PlayerJoined">
 		<span>
 			if len(players) < 2 {
@@ -24,9 +24,7 @@ templ OpenLobby(players []string, sessionId model.GameId, joinUrl templ.SafeURL)
 				<button onClick="copyToClipBoard()" class="text-xl font-bold">copy session link</button>
 				<p>waiting for second player</p>
 			}
-			for x, player := range players {
-				<p>player { fmt.Sprintf("%v",x) }: { player } </p>
-			}
+			@PlayerList(players)
 			<h2>
 				session code: { sessionId }
 			</h2>
