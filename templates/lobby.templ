@@ -17,19 +17,10 @@ templ CreateLobby() {
 }
 
 templ OpenLobby(players []string, sessionId model.GameId, joinUrl templ.SafeURL) {
-	@copySessionLinkHandle.Once() {
-		@templ.JSONScript("url", joinUrl)
-		<script type="text/javascript">
-			function copyToClipBoard(){
-				const link = JSON.parse(document.getElementById('url').textContent);
-				navigator.clipboard.writeText(link);
-				alert("Join link copied!");
-			} 
-		</script>
-	}
-	<div hx-ext="sse" sse-connect={ fmt.Sprintf("/events/%v", sessionId) } sse-swap="message" sse-close="PlayerJoined">
+	<div hx-ext="sse" sse-connect={ fmt.Sprintf("/events/%v", sessionId) } sse-swap="PlayerJoined">
 		<span>
 			if len(players) < 2 {
+				@CopyToClipBoardScript(joinUrl)
 				<button onClick="copyToClipBoard()" class="text-xl font-bold">copy session link</button>
 				<p>waiting for second player</p>
 			}

@@ -1,0 +1,14 @@
+package templates
+
+templ CopyToClipBoardScript(joinUrl templ.SafeURL) {
+	@templ.JSONScript("url", joinUrl)
+	@copySessionLinkHandle.Once() {
+		<script type="text/javascript">
+        function copyToClipBoard(){
+          const link = JSON.parse(document.getElementById('url').textContent);
+          navigator.clipboard.writeText(link);
+          alert("Join link copied!");
+        } 
+      </script>
+	}
+}
